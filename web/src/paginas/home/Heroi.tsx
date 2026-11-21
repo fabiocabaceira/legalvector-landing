@@ -1,0 +1,80 @@
+import { motion } from "framer-motion";
+import { CTA, HERO_FILM, PAGINA, curva, type Linhas } from "../../base";
+import { Filme } from "../../filme";
+import { BotaoFantasma, BotaoPrincipal, IcCamadas, IcDocumento, IcPasta, TextoDesfocado, useCortina, useMov } from "../../ui";
+
+const H1: Linhas = PAGINA === "ask" ? ["Stop emailing Legal.", "Start asking Legal."] : ["Legal isn’t the bottleneck.", "Email is."];
+
+const OBRAS = [
+  ["Alfresco Content Services", IcCamadas],
+  ["Doxis 4", IcPasta],
+  ["Microsoft Word", IcDocumento],
+] as const;
+
+/** Copy deck 3.1: the pain in the h1, the real product film beside it with captions on, one CTA. */
+export default function Heroi() {
+  const aberta = useCortina();
+  const mov = useMov();
+  const entra = (atraso: number) => ({
+    initial: mov ? { opacity: 0, y: 12, filter: "blur(6px)" } : false,
+    animate: aberta ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined,
+    transition: { duration: 0.55, delay: atraso, ease: curva },
+  });
+
+  return (
+    <section id="top" aria-labelledby="t-topo" className="relative flex min-h-[100svh] flex-col overflow-hidden pt-24 sm:pt-28">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="grade-fundo absolute inset-0" />
+        <div className="absolute right-[-10%] top-[-260px] h-[620px] w-[1000px] rounded-full bg-[radial-gradient(closest-side,rgba(20,184,166,.28),transparent)]" />
+        <div className="absolute bottom-[-180px] left-[-12%] h-[420px] w-[760px] rounded-full bg-[radial-gradient(closest-side,rgba(15,118,110,.22),transparent)]" />
+      </div>
+
+      {/* text first in the DOM (reading and focus order); the film moves above it on phones only */}
+      <div className="relative mx-auto my-auto grid w-full max-w-[1360px] items-center gap-8 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1fr)]">
+        <div className="min-w-0">
+          <h1 id="t-topo" className="text-balance text-[1.875rem] font-[650] leading-[1.05] tracking-[-0.045em] text-white sm:text-5xl lg:text-[clamp(2.4rem,3.65vw,3.25rem)]">
+            <TextoDesfocado linhas={H1} ativo={aberta} atraso={0.1} />
+          </h1>
+
+          <motion.p {...entra(0.45)} className="mt-5 max-w-md text-pretty text-base leading-relaxed text-mute sm:text-lg">
+            One front door to Legal. Everyone sees where their request stands.
+          </motion.p>
+
+          <motion.div {...entra(0.6)} className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <BotaoPrincipal href="#demo" data-cta="hero">
+              {CTA}
+            </BotaoPrincipal>
+            <BotaoFantasma href="#features">See how it works</BotaoFantasma>
+          </motion.div>
+        </div>
+
+        <div className="order-first min-w-0 lg:order-none">
+          <Filme filme={HERO_FILM} modo="heroi" atraso={0.05} />
+        </div>
+      </div>
+
+      <motion.ul
+        initial={mov ? { opacity: 0, y: 10 } : false}
+        animate={aberta ? { opacity: 1, y: 0 } : undefined}
+        transition={{ duration: 0.6, delay: 0.8, ease: curva }}
+        aria-label="Runs on Alfresco or Doxis, with changes as Word tracked changes"
+        className="relative mx-auto grid w-full max-w-md grid-cols-3 gap-2 px-4 pb-8 pt-10 sm:flex sm:w-fit sm:max-w-none sm:gap-x-10 sm:px-8 sm:pb-10"
+      >
+        {OBRAS.map(([t, Icone], i) => (
+          <motion.li
+            key={t}
+            initial={mov ? { opacity: 0, y: 8, filter: "blur(4px)" } : false}
+            animate={aberta ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
+            transition={{ duration: 0.5, delay: 0.85 + i * 0.09, ease: curva }}
+            className="flex flex-col items-center gap-2 text-center text-[13px] leading-tight text-white/70 sm:flex-row sm:gap-2.5 sm:text-left sm:text-sm"
+          >
+            <span className="vidro grid h-9 w-9 shrink-0 place-items-center rounded-full text-mint">
+              <Icone className="h-[17px] w-[17px]" />
+            </span>
+            {t}
+          </motion.li>
+        ))}
+      </motion.ul>
+    </section>
+  );
+}
