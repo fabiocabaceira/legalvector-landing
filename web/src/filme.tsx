@@ -326,7 +326,7 @@ export function Filme({
           >
             <video
               ref={video}
-              src={A(src) + (inicio ? `#t=${inicio}` : "")}
+              src={A(src)}
               poster={A(filme.poster)}
               muted
               playsInline
