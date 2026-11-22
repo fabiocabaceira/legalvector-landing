@@ -286,6 +286,22 @@ export function Filme({
     v.play().catch(() => {});
   }
 
+  // the centre button: play() runs inside the tap itself, which iOS needs (also in Low Power Mode)
+  function playCentro(e: React.MouseEvent) {
+    e.stopPropagation();
+    const v = video.current!;
+    maoPausou.current = false;
+    pronto.current = true;
+    if (!escolheuSom.current) {
+      escolheuSom.current = true;
+      v.muted = false;
+    }
+    v.play().catch(() => {
+      v.muted = true;
+      v.play().catch(() => {});
+    });
+  }
+
   // first tap on a muted film turns the sound on; after that a tap pauses and resumes
   function tocaVideo() {
     if (video.current!.muted && !escolheuSom.current) comSomDoInicio();
@@ -351,7 +367,19 @@ export function Filme({
               </p>
             )}
 
-            {!som && (
+            {!toca && (
+              <button
+                type="button"
+                onClick={playCentro}
+                aria-label="Play the video"
+                data-play-centro=""
+                className="absolute left-1/2 top-1/2 z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[rgba(11,21,20,.72)] text-white shadow-[0_18px_40px_-16px_rgba(0,0,0,.7)] ring-1 ring-white/25 backdrop-blur-md transition hover:scale-105 hover:bg-[rgba(20,43,41,.9)] sm:h-24 sm:w-24"
+              >
+                <Play className="ml-1 h-7 w-7 sm:h-10 sm:w-10" />
+              </button>
+            )}
+
+            {toca && !som && (
               <button
                 type="button"
                 onClick={(e) => {
