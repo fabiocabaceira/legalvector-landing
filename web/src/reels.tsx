@@ -9,11 +9,11 @@ export interface Reel {
   titulo: string;
 }
 
-/** The three 9:16 reels, in the order of the reels body sentence (copy deck 3.2). */
+/** The three 9:16 reels, in the order of the reels body sentence; each title is the reel's own closing line. */
 export const REELS: readonly Reel[] = [
-  { id: "reel-intake", titulo: "How many requests reached Legal today?" },
-  { id: "reel-review", titulo: "One contract. Five versions." },
-  { id: "reel-deadlines", titulo: "The notice deadline passed yesterday." },
+  { id: "legalVector-reel-1-round-two", titulo: "Bring their second draft. See what changed." },
+  { id: "legalVector-reel-2-counterparties", titulo: "Know them before the call." },
+  { id: "legalVector-reel-3-dashboard", titulo: "Report to the GC in one click." },
 ];
 
 const SVG_SOM_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
@@ -53,12 +53,32 @@ export function Carrossel({ reels = REELS, rotulo = "legalVector reels" }: { ree
       li.className = "reels-cartao";
       li.dataset.reel = r.id;
       li.innerHTML =
-        `<video muted playsinline preload="none" poster="${A(`campaign/film/${r.id}.webp`)}" data-src="${A(`campaign/film/${r.id}.mp4`)}" width="720" height="1280"></video>` +
-        `<span class="reels-pausa" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg></span>` +
+        `<video muted playsinline loop preload="none" poster="${A(`campaign/film/${r.id}.webp`)}" data-src="${A(`campaign/film/${r.id}.mp4`)}" width="720" height="1280"></video>` +
+        `<button type="button" class="reels-play" data-play-centro aria-label="Play the reel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg></button>` +
         `<input type="range" class="barra-video reels-barra" min="0" max="1000" step="1" value="0" aria-label="Reel position">`;
       const v = li.querySelector("video")!;
       v.setAttribute("aria-label", r.titulo);
       const barra = li.querySelector<HTMLInputElement>(".reels-barra")!;
+      // as on the hero film: play() runs inside the tap itself, with sound, and falls back to muted if iOS refuses
+      li.querySelector<HTMLButtonElement>(".reels-play")!.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (cur !== i) return;
+        li.dataset.mao = "";
+        if (!v.getAttribute("src")) v.src = v.dataset.src!;
+        if (v.error) v.load();
+        somLigado = true;
+        v.muted = false;
+        pedeSom("reels");
+        marcaSom();
+        v.play().catch(() => {
+          somLigado = false;
+          marcaSom();
+          v.muted = true;
+          v.play().catch(() => {});
+        });
+        track("reel_play", { reel: r.id });
+      });
       li.addEventListener("click", (e) => {
         if ((e.target as Element).closest(".reels-barra")) return;
         if (arrastou) {
@@ -80,10 +100,9 @@ export function Carrossel({ reels = REELS, rotulo = "legalVector reels" }: { ree
           v.pause();
         }
       });
-      v.addEventListener("ended", () => {
-        if (cur === i) vai(i + 1);
-      });
-      (["play", "pause"] as const).forEach((t) => v.addEventListener(t, () => li.classList.toggle("pausado", !!li.dataset.mao && v.paused)));
+      const parou = () => li.classList.toggle("parado", v.paused);
+      (["play", "pause"] as const).forEach((t) => v.addEventListener(t, parou));
+      parou();
       v.addEventListener("timeupdate", () => {
         if (!v.duration) return;
         const p = v.currentTime / v.duration;
@@ -113,12 +132,15 @@ export function Carrossel({ reels = REELS, rotulo = "legalVector reels" }: { ree
         li.style.pointerEvents = a > 1 ? "none" : "auto";
         li.classList.toggle("frente", a === 0);
         li.setAttribute("aria-hidden", a ? "true" : "false");
-        li.querySelectorAll("input").forEach((el) => (el.tabIndex = a ? -1 : 0));
+        li.querySelectorAll("input, button").forEach((el) => ((el as HTMLElement).tabIndex = a ? -1 : 0));
         const v = li.querySelector("video")!;
         if (a) li.dataset.mao = "";
         if (a <= 1 && !v.getAttribute("src")) v.src = v.dataset.src!;
         if (a <= 1 && dentro) v.preload = a === 0 ? "auto" : "metadata";
-        if (a === 0 && dentro && !li.dataset.mao && (!parado() || somLigado)) {
+        const anda = a === 0 && dentro && !li.dataset.mao && (!parado() || somLigado);
+        // muted autoplay only on the front reel while the deck is in view, so the neighbours never load and play behind it
+        v.autoplay = anda;
+        if (anda) {
           v.muted = !somLigado;
           const p = v.play();
           if (p)
@@ -251,9 +273,10 @@ export function Carrossel({ reels = REELS, rotulo = "legalVector reels" }: { ree
     };
     raiz.addEventListener("touchstart", tIni, { passive: true });
     raiz.addEventListener("touchend", tFim, { passive: true });
-    // iPhone in low power mode: a tap with the deck in view starts the front reel
-    const toque = () => {
-      if (!dentro || parado()) return;
+    // iPhone in low power mode: a tap with the deck in view starts the front reel. A tap on the deck itself is left
+    // to its own click handlers: playing here first would make the card's click pause the reel at once.
+    const toque = (e: TouchEvent) => {
+      if (!dentro || parado() || raiz.contains(e.target as Node)) return;
       const v = lis[cur].querySelector("video")!;
       if (v.paused && !lis[cur].dataset.mao) v.play().catch(() => {});
     };

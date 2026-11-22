@@ -136,9 +136,10 @@ body { margin: 0; color: var(--color-texto); font-family: var(--font-sans); font
 .reels-cartao video { display: block; width: 100%; height: 100%; object-fit: cover; }
 .reels-barra { position: absolute; z-index: 2; left: 12px; right: 12px; bottom: 10px; width: calc(100% - 24px); opacity: 0; pointer-events: none; transition: opacity .3s linear; }
 .reels-cartao.frente .reels-barra { opacity: 1; pointer-events: auto; }
-.reels-pausa { position: absolute; z-index: 2; inset: 0; margin: auto; width: 60px; height: 60px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .22); background: rgba(11, 21, 20, .6); color: #fff; opacity: 0; scale: .85; transition: opacity .2s, scale .2s; pointer-events: none; }
-.reels-pausa svg { width: 22px; height: 22px; margin-left: 3px; fill: currentColor; }
-.reels-cartao.pausado .reels-pausa { opacity: 1; scale: 1; }
+/* the centre play button: on the front reel whenever it is stopped; the tap calls play() itself */
+.reels-play { position: absolute; z-index: 3; inset: 0; margin: auto; width: 64px; height: 64px; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .25); background: rgba(11, 21, 20, .72); color: #fff; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .7); backdrop-filter: blur(12px); cursor: pointer; visibility: hidden; opacity: 0; scale: .85; pointer-events: none; transition: opacity .2s, scale .2s, visibility 0s .2s; }
+.reels-play svg { width: 26px; height: 26px; margin-left: 4px; fill: currentColor; }
+.reels-cartao.frente.parado .reels-play { visibility: visible; opacity: 1; scale: 1; pointer-events: auto; transition-delay: 0s; }
 .reels-painel { display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-radius: 999px; color: #fff; }
 .reels-seta { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: inherit; background: transparent; border: 0; cursor: pointer; transition: background-color .2s linear; }
 .reels-seta svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }

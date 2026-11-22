@@ -14,7 +14,7 @@ export default function Dores() {
         />
         <Surge atraso={0.12} className="lg:pt-3">
           <p className="border-t border-white/15 pt-5 text-pretty text-base leading-relaxed text-white/80 sm:text-lg">
-            Three moments Legal teams know too well, each under half a minute: the requests nobody counted, the clause nobody read, the notice date nobody watched.
+            Three moments Legal teams know too well, each about half a minute: the second draft that just landed, the call with a counterparty, the Monday report to the GC.
           </p>
         </Surge>
       </div>

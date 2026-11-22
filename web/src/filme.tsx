@@ -292,6 +292,7 @@ export function Filme({
     const v = video.current!;
     maoPausou.current = false;
     pronto.current = true;
+    if (v.error || v.networkState === v.NETWORK_NO_SOURCE) v.load();
     if (!escolheuSom.current) {
       escolheuSom.current = true;
       v.muted = false;
@@ -308,9 +309,10 @@ export function Filme({
     else alternarPlay();
   }
 
-  // touch has no hover: a tap shows the bar for a few seconds
+  // touch has no hover: a tap on the running film shows the bar for a few seconds. While stopped the bar stays
+  // hidden, so the tap meant for the centre button changes nothing on screen before its click (iOS drops a click then)
   function revela(e: React.PointerEvent) {
-    if (e.pointerType === "mouse") return;
+    if (e.pointerType === "mouse" || !toca) return;
     setMostra(true);
     clearTimeout(esconde.current);
     esconde.current = window.setTimeout(() => setMostra(false), 3000);
@@ -324,14 +326,15 @@ export function Filme({
   }
 
   const botao = "grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition hover:bg-white/15";
-  const visto = mostra || !toca;
+  const visto = mostra && toca;
   const heroi = modo === "heroi";
   return (
     <div className={`relative ${className}`}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-12 bottom-0 top-12 rounded-[40px] bg-glow/25 blur-[90px]" />
       <motion.div
         initial={heroi ? { y: 20, filter: "blur(8px)" } : false}
-        animate={heroi ? (cortina ? { y: 0, filter: "blur(0px)" } : { y: 20, filter: "blur(8px)" }) : undefined}
+        // after the entrance the filter goes away entirely: a filtered ancestor can stop WebKit painting the video frames
+        animate={heroi ? (cortina ? { y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } } : { y: 20, filter: "blur(8px)" }) : undefined}
         transition={{ duration: 0.6, delay: atraso, ease: curva }}
       >
         <div className={heroi ? `${moldura} p-2 sm:p-3` : ""}>
@@ -373,9 +376,9 @@ export function Filme({
                 onClick={playCentro}
                 aria-label="Play the video"
                 data-play-centro=""
-                className="absolute left-1/2 top-1/2 z-10 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[rgba(11,21,20,.72)] text-white shadow-[0_18px_40px_-16px_rgba(0,0,0,.7)] ring-1 ring-white/25 backdrop-blur-md transition hover:scale-105 hover:bg-[rgba(20,43,41,.9)] sm:h-24 sm:w-24"
+                className="absolute left-1/2 top-1/2 z-20 grid h-[72px] w-[72px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[rgba(11,21,20,.72)] text-white shadow-[0_18px_40px_-16px_rgba(0,0,0,.7)] ring-1 ring-white/25 backdrop-blur-md transition hover:scale-105 hover:bg-[rgba(20,43,41,.9)] sm:h-24 sm:w-24"
               >
-                <Play className="ml-1 h-7 w-7 sm:h-10 sm:w-10" />
+                <Play className="ml-1 h-8 w-8 sm:h-10 sm:w-10" />
               </button>
             )}
 
@@ -394,7 +397,7 @@ export function Filme({
             )}
 
             <div
-              className={`absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-[rgba(11,21,20,.9)] via-[rgba(11,21,20,.45)] to-transparent px-2 pb-2 pt-12 transition-opacity duration-300 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 sm:gap-3 sm:px-3 ${visto ? "opacity-100" : "pointer-events-none opacity-0"}`}
+              className={`absolute inset-x-0 bottom-0 z-10 flex items-center gap-2 bg-gradient-to-t from-[rgba(11,21,20,.9)] via-[rgba(11,21,20,.45)] to-transparent px-2 pb-2 pt-12 transition-opacity duration-300 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 sm:gap-3 sm:px-3 ${visto ? "opacity-100" : "pointer-events-none opacity-0"}`}
             >
               <button type="button" onClick={alternarPlay} aria-label={toca ? "Pause the video" : "Play the video"} className={botao}>
                 {toca ? <Pausa className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
