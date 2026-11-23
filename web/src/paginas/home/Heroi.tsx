@@ -61,7 +61,9 @@ export default function Heroi() {
         <span className="vidro grid h-10 w-10 shrink-0 place-items-center rounded-full">
           <LogoParceiro marca="doxis" className="h-6 w-6" />
         </span>
-        Doxis 4
+        <span>
+          <span className="text-white/55">Runs inside</span> <span className="font-medium text-white">Doxis 4</span>
+        </span>
       </motion.div>
     </section>
   );
