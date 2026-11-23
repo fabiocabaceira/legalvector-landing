@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useInView } from "framer-motion";
 import { curva } from "../../base";
-import { IcPasta, Marca, moldura, useMov } from "../../ui";
+import { LogoParceiro, Marca, moldura, useMov } from "../../ui";
 import { DadosExemplo, IcFaisca } from "./comum";
 
 const mola = { type: "spring", stiffness: 240, damping: 21 } as const;
@@ -95,7 +95,7 @@ export function Camadas() {
         </motion.span>
       </div>
 
-      <Camada ver={ver} de={-28} atraso={0.65} icone={<span className={`${azulejo} border-glow/30 bg-glow/10 text-mint`}><IcPasta className="h-5 w-5" /></span>}>
+      <Camada ver={ver} de={-28} atraso={0.65} icone={<span className={`${azulejo} border-white/10 bg-white/[.05]`}><LogoParceiro marca="alfresco" className="h-6 w-6" /></span>}>
         <span className="text-[15px] font-semibold text-white sm:text-base">Alfresco Content Services</span>
       </Camada>
 

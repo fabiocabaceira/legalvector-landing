@@ -1,4 +1,4 @@
-// Renders the home share card (copy deck §9) to public/og-v5.jpg, 1200x630. /ask/ keeps ask/og-v4.jpg.
+// Renders the home share card (copy deck §9) to public/og-v6.jpg, 1200x630. /ask/ keeps ask/og-v4.jpg.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium } from "playwright-core";
@@ -24,13 +24,13 @@ h1 span { display: block; }
 p { margin-top: 28px; font-size: 30px; color: #b9c6c3; letter-spacing: -0.01em; }
 </style></head><body><div class="grade"></div><div class="luz"></div><div class="luz2"></div>
 <div class="c"><div class="logo"><img src="data:image/svg+xml;base64,${marca}" alt=""><span>legal<b>Vector</b></span></div>
-<h1><span>Legal isn't the bottleneck.</span><span class="g">Email is.</span></h1>
+<h1><span>Make Legal the fastest team</span><span class="g">in the building.</span></h1>
 <p>One front door to Legal · On Alfresco or Doxis</p></div></body></html>`;
 
 const browser = await chromium.launch(process.env.LV_CHROME ? { executablePath: process.env.LV_CHROME } : {});
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
 await page.setContent(html, { waitUntil: "load" });
 await page.evaluate(() => document.fonts.ready);
-await page.screenshot({ path: resolve(PUB, "og-v5.jpg"), type: "jpeg", quality: 88 });
+await page.screenshot({ path: resolve(PUB, "og-v6.jpg"), type: "jpeg", quality: 88 });
 await browser.close();
-console.log("public/og-v5.jpg written");
+console.log("public/og-v6.jpg written");

@@ -43,7 +43,7 @@ function Lab() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.82fr_1fr]">
           <div>
             <h1 id="t-topo" className="text-balance text-[2.5rem] font-[650] leading-[1.02] tracking-[-0.045em] text-white sm:text-6xl">
-              <TextoDesfocado linhas={["Legal isn't the bottleneck.", "Email is."]} />
+              <TextoDesfocado linhas={["Make Legal the fastest team", "in the building."]} />
             </h1>
             <div className="mt-8 flex flex-wrap gap-3">
               <BotaoPrincipal href="#demo" data-cta="hero">

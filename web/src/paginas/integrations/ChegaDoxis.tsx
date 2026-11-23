@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { curva } from "../../base";
-import { IcDocumento, IcPasta, IcPorta, Marca, moldura, useMov } from "../../ui";
+import { IcDocumento, IcPorta, LogoParceiro, Marca, moldura, useMov } from "../../ui";
 import { DadosExemplo } from "./comum";
 
 const LINHAS = ["Descriptors", "File", "Number"] as const;
@@ -140,8 +140,8 @@ export function ChegaDoxis() {
           className="rounded-2xl border border-white/[.08] bg-night/60 p-3.5 sm:p-4"
         >
           <div className="flex items-center gap-2.5 border-b border-white/[.07] pb-3">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-glow/30 bg-glow/10 text-mint">
-              <IcPasta className="h-4 w-4" />
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[.05]">
+              <LogoParceiro marca="doxis" className="h-[18px] w-[18px]" />
             </span>
             <span className="text-[15px] font-semibold text-white">Doxis</span>
           </div>

@@ -1,15 +1,20 @@
 import { motion } from "framer-motion";
 import { CTA, HERO_FILM, PAGINA, curva, type Linhas } from "../../base";
 import { Filme } from "../../filme";
-import { BotaoFantasma, BotaoPrincipal, IcCamadas, IcDocumento, IcPasta, TextoDesfocado, useCortina, useMov } from "../../ui";
+import { BotaoFantasma, BotaoPrincipal, LogoParceiro, TextoDesfocado, useCortina, useMov, type Parceiro } from "../../ui";
 
-const H1: Linhas = PAGINA === "ask" ? ["Stop emailing Legal.", "Start asking Legal."] : ["Legal isn’t the bottleneck.", "Email is."];
+const H1: Linhas = PAGINA === "ask" ? ["Stop emailing Legal.", "Start asking Legal."] : ["Make Legal the fastest team", "in the building."];
+// the home line 1 is 12.42 em wide: these sizes keep it on one row from a 360 px phone to the 1360 px column
+const TAMANHO =
+  PAGINA === "ask"
+    ? "text-[1.875rem] sm:text-5xl lg:text-[clamp(2.4rem,3.65vw,3.25rem)]"
+    : "text-[length:min(1.875rem,calc((100vw_-_2.5rem)/12.8))] sm:text-[length:clamp(2.2rem,7vw,3rem)] lg:text-[length:clamp(2.2rem,3.3vw,2.95rem)]";
 
-const OBRAS = [
-  ["Alfresco Content Services", IcCamadas],
-  ["Doxis 4", IcPasta],
-  ["Microsoft Word", IcDocumento],
-] as const;
+const OBRAS: ReadonlyArray<readonly [string, Parceiro]> = [
+  ["Alfresco Content Services", "alfresco"],
+  ["Doxis 4", "doxis"],
+  ["Microsoft Word", "word"],
+];
 
 /** Copy deck 3.1: the pain in the h1, the real product film beside it with captions on, one CTA. */
 export default function Heroi() {
@@ -32,7 +37,7 @@ export default function Heroi() {
       {/* text first in the DOM (reading and focus order); the film moves above it on phones only */}
       <div className="relative mx-auto my-auto grid w-full max-w-[1360px] items-center gap-8 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,0.94fr)_minmax(0,1fr)]">
         <div className="min-w-0">
-          <h1 id="t-topo" className="text-balance text-[1.875rem] font-[650] leading-[1.05] tracking-[-0.045em] text-white sm:text-5xl lg:text-[clamp(2.4rem,3.65vw,3.25rem)]">
+          <h1 id="t-topo" className={`text-balance font-[650] leading-[1.05] tracking-[-0.045em] text-white ${TAMANHO}`}>
             <TextoDesfocado linhas={H1} ativo={aberta} atraso={0.1} />
           </h1>
 
@@ -60,7 +65,7 @@ export default function Heroi() {
         aria-label="Runs on Alfresco or Doxis, with changes as Word tracked changes"
         className="relative mx-auto grid w-full max-w-md grid-cols-3 gap-2 px-4 pb-8 pt-10 sm:flex sm:w-fit sm:max-w-none sm:gap-x-10 sm:px-8 sm:pb-10"
       >
-        {OBRAS.map(([t, Icone], i) => (
+        {OBRAS.map(([t, marca], i) => (
           <motion.li
             key={t}
             initial={mov ? { opacity: 0, y: 8, filter: "blur(4px)" } : false}
@@ -68,8 +73,8 @@ export default function Heroi() {
             transition={{ duration: 0.5, delay: 0.85 + i * 0.09, ease: curva }}
             className="flex flex-col items-center gap-2 text-center text-[13px] leading-tight text-white/70 sm:flex-row sm:gap-2.5 sm:text-left sm:text-sm"
           >
-            <span className="vidro grid h-9 w-9 shrink-0 place-items-center rounded-full text-mint">
-              <Icone className="h-[17px] w-[17px]" />
+            <span className="vidro grid h-10 w-10 shrink-0 place-items-center rounded-full">
+              <LogoParceiro marca={marca} className="h-6 w-6" />
             </span>
             {t}
           </motion.li>

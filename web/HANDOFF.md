@@ -106,10 +106,10 @@ All commands run in `C:\Users\Fabio\dev\legalvector-landing\web`.
 | `src/etapas.tsx` | Steps with the scroll rail |
 | `src/abertura.tsx` | Home intro |
 | `src/paginas/*.tsx` | The pages (yours) |
-| `public/` | Media at the v4 paths: `campaign/film/`, `img/v4/`, `brand/`, `fonts/`, `ask/og-v4.jpg`, `og-v5.jpg`, `robots.txt` |
+| `public/` | Media at the v4 paths: `campaign/film/`, `img/v4/`, `brand/`, `fonts/`, `ask/og-v4.jpg`, `og-v6.jpg`, `robots.txt` |
 | `scripts/serve.mjs` | Static server like desk.texter.ai (`/r/LV-####`, `/ask/r/LV-####`, sub-path, `POST /lv/t` = 405) |
 | `scripts/check.mjs` | The browser check of the gate |
-| `scripts/og.mjs` | Renders `public/og-v5.jpg` (`npm run og`) |
+| `scripts/og.mjs` | Renders `public/og-v6.jpg` (`npm run og`) |
 
 ### Media in `public/`
 
@@ -218,6 +218,6 @@ Motion: the head script sets `html[data-mov]` from `lv-calm` and `prefers-reduce
 5. **WhatsApp text.** The prefill keeps the v4 spelling "LegalVector" (lv-facts 9). The deck writes "legalVector". The server reads the v4 text, so it stays.
 6. **Film button text.** The centre button says "Listen with sound" (copy deck 2.5).
 7. **Hero film.** `HERO_FILM` is the interim `live-front-door.mp4`. A new film changes only `src/filme-heroi.ts`.
-8. **Share cards.** Home and inner pages use `og-v5.jpg` ("Legal isn't the bottleneck. / Email is."). `/ask/` uses `ask/og-v4.jpg`. If the owner picks the fallback h1 (OPEN RISKS 2), change the text in `scripts/og.mjs` and run `npm run og`.
+8. **Share cards.** Home and inner pages use `og-v6.jpg` ("Make Legal the fastest team / in the building."). `/ask/` uses `ask/og-v4.jpg`. If the owner picks the fallback h1 (OPEN RISKS 2), change the text in `scripts/og.mjs` and run `npm run og`.
 9. **Visit tracker keys.** Only `topo`, `problema` and `demo` are on the live server list (OPEN RISKS 11).
 10. **Open risks.** Read OPEN RISKS in `copy-deck.md`. Do not show a demo length (1). Do not render "Watch the full tour · 3:38" (5). Do not show Teams or Slack (8). Code only the four visuals of risk 9.

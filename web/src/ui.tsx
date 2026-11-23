@@ -340,6 +340,16 @@ export function Logotipo({ className = "", topo = false }: { className?: string;
   );
 }
 
+/** Official marks of the products legalVector runs on: transparent PNGs, 192 px on the long side. */
+const PARCEIROS = { alfresco: [192, 192], doxis: [192, 156], word: [187, 192] } as const;
+export type Parceiro = keyof typeof PARCEIROS;
+
+/** The product name always sits beside the mark, so the alt stays empty to avoid reading it twice. */
+export function LogoParceiro({ marca, className = "" }: { marca: Parceiro; className?: string }) {
+  const [w, h] = PARCEIROS[marca];
+  return <img src={A(`img/logos/${marca}.png`)} alt="" width={w} height={h} decoding="async" draggable={false} className={`object-contain ${className}`} />;
+}
+
 /* ---------------- icons ---------------- */
 type Icone = (p: SVGProps<SVGSVGElement>) => JSX.Element;
 
