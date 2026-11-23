@@ -4,7 +4,6 @@ import { curva } from "../../base";
 import { IcDocumento, IcPasta, IcPorta, Marca, moldura, useMov } from "../../ui";
 import { DadosExemplo } from "./comum";
 
-// live-front-door.vtt cue 11: "It is now a Legal Request in Doxis: descriptors, file, and a number."
 const LINHAS = ["Descriptors", "File", "Number"] as const;
 const LARGURAS = ["w-[62%]", "w-[44%]", "w-[30%]"];
 

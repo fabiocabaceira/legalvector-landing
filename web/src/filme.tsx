@@ -361,7 +361,7 @@ export function Filme({
               <track kind="captions" src={A(filme.vtt)} srcLang="en" label="English" default />
             </video>
 
-            {cue && (
+            {cue && !filme.legendasQueimadas && (
               <p
                 aria-hidden="true"
                 className={`pointer-events-none absolute left-1/2 hidden w-max max-w-[92%] -translate-x-1/2 rounded-lg bg-[rgba(11,21,20,.8)] px-3 py-1.5 text-center text-[15px] font-medium leading-snug text-white ring-1 ring-white/10 backdrop-blur-md transition-[bottom] duration-300 sm:block ${visto ? "bottom-14" : "bottom-3 group-hover:bottom-14 group-focus-within:bottom-14"}`}

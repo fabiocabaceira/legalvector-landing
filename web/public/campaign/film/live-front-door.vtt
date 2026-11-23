@@ -1,45 +1,37 @@
 WEBVTT
 
 1
-00:00:00.220 --> 00:00:04.540
-Requests still start as an email, an attachment, a spreadsheet.
+00:00:00.400 --> 00:00:03.850
+This is legalVector, the desk for your Legal team.
 
 2
-00:00:04.540 --> 00:00:06.580
-Here, one front door.
+00:00:03.850 --> 00:00:07.000
+Any department asks Legal through one front door.
 
 3
-00:00:06.580 --> 00:00:07.580
-Pick the kind.
+00:00:07.000 --> 00:00:10.300
+Drop a Word contract, and the form fills itself.
 
 4
-00:00:07.580 --> 00:00:09.060
-The form adapts.
+00:00:10.300 --> 00:00:14.750
+Before a lawyer opens it, the AI checks every clause against your playbook.
 
 5
-00:00:09.060 --> 00:00:13.380
-Drop the vendor's draft, a managed IT services agreement.
+00:00:14.750 --> 00:00:18.700
+Each finding points at the exact words, and proposes the wording.
 
 6
-00:00:13.380 --> 00:00:19.820
-legalVector fills only the empty fields: title, counterparty, contract type, and what
+00:00:18.700 --> 00:00:22.200
+Accept it, and it becomes a real Word tracked change.
 
 7
-00:00:19.820 --> 00:00:21.020
-Legal should know.
+00:00:22.200 --> 00:00:26.200
+A failing clause blocks approval, until a lawyer records why.
 
 8
-00:00:21.020 --> 00:00:23.580
-Each field says it came from the document.
+00:00:26.200 --> 00:00:30.200
+Notice deadlines and renewals land on one screen, ready for your calendar.
 
 9
-00:00:23.580 --> 00:00:25.020
-Undo if you want.
-
-10
-00:00:25.020 --> 00:00:26.660
-One click sends it.
-
-11
-00:00:26.660 --> 00:00:32.220
-It is now a Legal Request in Doxis: descriptors, file, and a number.
+00:00:30.400 --> 00:00:38.677
+Real product, demo data.
