@@ -61,10 +61,39 @@ export function Filme({
   const [toca, setToca] = useState(false);
   const [mostra, setMostra] = useState(false);
   const [cue, setCue] = useState("");
+  // frames really moving (currentTime advancing while playing). The poster layer, our play button, the sound pill
+  // and the native controls follow this and not the play event: iOS in Low Power Mode fires play and then paints
+  // nothing, which left a black box with the native slashed play glyph and no button of ours
+  const [anda, setAnda] = useState(false);
+  const [jaAndou, setJaAndou] = useState(false);
+  const [falhou, setFalhou] = useState(false);
+  const andaRef = useRef(false);
+  const bloqueado = useRef(false);
+  const vigia = useRef(0);
   // touch screens: while the film plays the native controls are on as well, which iOS Safari sometimes needs
   const [toque] = useState(() => matchMedia("(hover: none) and (pointer: coarse)").matches);
-  const nativos = toque && toca;
+  const nativos = toque && anda;
   const [src] = useState(() => (filme.src1080 && innerWidth * (devicePixelRatio || 1) > 1400 ? filme.src1080 : filme.src720));
+
+  // no frames 1.5 s after an autoplay (6 s after a tap): stop for real, so the poster and our play button come back.
+  // A refused autoplay is not retried by itself until the next tap
+  function armaVigia(v: HTMLVideoElement, gesto: boolean) {
+    clearTimeout(vigia.current);
+    vigia.current = window.setTimeout(() => {
+      if (andaRef.current) return;
+      if (!gesto) bloqueado.current = true;
+      if (!v.paused) v.pause();
+      setToca(false);
+    }, gesto ? 6000 : 1500);
+  }
+  function tenta(v: HTMLVideoElement, gesto: boolean) {
+    if (gesto) bloqueado.current = false;
+    else if (bloqueado.current) return;
+    if (gesto && (v.error || v.networkState === v.NETWORK_NO_SOURCE)) v.load();
+    setFalhou(false);
+    tocar(v);
+    armaVigia(v, gesto);
+  }
 
   // hero: wait for the intro, the load and the largest paint (or 3 s), then try with sound
   useEffect(() => {
@@ -86,7 +115,7 @@ export function Filme({
       // a seek before the metadata can break the first play on iOS
       if (inicio || v.readyState >= 1) v.currentTime = inicio;
       v.muted = false;
-      if (visivel.current && !maoPausou.current) tocar(v);
+      if (visivel.current && !maoPausou.current) tenta(v, true);
     }
     const arranca = () => {
       if (!vivo) return;
@@ -96,6 +125,7 @@ export function Filme({
         return;
       }
       v.muted = false;
+      armaVigia(v, false);
       v.play().catch(() => {
         v.muted = true;
         v.play().catch(() => {});
@@ -154,7 +184,7 @@ export function Filme({
         visivel.current = e.isIntersecting;
         if (!e.isIntersecting) {
           if (!v.paused) v.pause();
-        } else if (v.paused && pronto.current && !maoPausou.current && movLigado()) tocar(v);
+        } else if (v.paused && pronto.current && !maoPausou.current && movLigado()) tenta(v, false);
       },
       { threshold: 0.25 },
     );
@@ -221,13 +251,37 @@ export function Filme({
     };
     const para = () => {
       setToca(false);
+      andaRef.current = false;
+      setAnda(false);
       cancelAnimationFrame(raf);
       desenha();
+    };
+    let ultimo = v.currentTime;
+    const avanca = () => {
+      const t = v.currentTime;
+      if (!v.paused && t > ultimo + 0.01 && !andaRef.current) {
+        andaRef.current = true;
+        clearTimeout(vigia.current);
+        setAnda(true);
+        setJaAndou(true);
+      }
+      ultimo = t;
+    };
+    // a broken or stalled load never leaves a black box: back to the poster and our play button
+    const avaria = () => {
+      clearTimeout(vigia.current);
+      andaRef.current = false;
+      setAnda(false);
+      setToca(false);
+      setFalhou(true);
+    };
+    const parado = () => {
+      if (!andaRef.current) setToca(false);
     };
     const fim = () => {
       v.muted = true;
       v.currentTime = inicio;
-      if (visivel.current && movLigado() && !maoPausou.current) v.play().catch(() => {});
+      if (visivel.current && movLigado() && !maoPausou.current) tenta(v, false);
     };
     v.addEventListener("play", liga);
     v.addEventListener("pause", para);
@@ -239,6 +293,9 @@ export function Filme({
     v.addEventListener("loadedmetadata", comeco);
     v.addEventListener("seeked", desenha);
     v.addEventListener("volumechange", ouve);
+    v.addEventListener("timeupdate", avanca);
+    v.addEventListener("error", avaria);
+    v.addEventListener("stalled", parado);
     if (v.readyState >= 1) comeco();
     if (!v.paused) liga();
     return () => {
@@ -250,6 +307,10 @@ export function Filme({
       v.removeEventListener("loadedmetadata", comeco);
       v.removeEventListener("seeked", desenha);
       v.removeEventListener("volumechange", ouve);
+      v.removeEventListener("timeupdate", avanca);
+      v.removeEventListener("error", avaria);
+      v.removeEventListener("stalled", parado);
+      clearTimeout(vigia.current);
     };
   }, [chave, inicio]);
 
@@ -263,7 +324,7 @@ export function Filme({
     if (movLigado() && visivel.current) {
       maoPausou.current = false;
       pronto.current = true;
-      v.play().catch(() => {});
+      tenta(v, false);
     }
   }, [salto, inicio]);
 
@@ -274,16 +335,16 @@ export function Filme({
     if (!v.muted && v.paused) {
       maoPausou.current = false;
       pronto.current = true;
-      tocar(v);
+      tenta(v, true);
     }
   }
 
   function alternarPlay() {
     const v = video.current!;
-    if (v.paused) {
+    if (v.paused || !andaRef.current) {
       maoPausou.current = false;
       pronto.current = true;
-      tocar(v);
+      tenta(v, true);
     } else {
       maoPausou.current = true;
       v.pause();
@@ -297,7 +358,7 @@ export function Filme({
     v.muted = false;
     maoPausou.current = false;
     pronto.current = true;
-    tocar(v);
+    tenta(v, true);
   }
 
   // the centre button: play() runs inside the tap itself, which iOS needs (also in Low Power Mode).
@@ -307,12 +368,11 @@ export function Filme({
     const v = video.current!;
     maoPausou.current = false;
     pronto.current = true;
-    if (v.error || v.networkState === v.NETWORK_NO_SOURCE) v.load();
     if (!escolheuSom.current) {
       escolheuSom.current = true;
       v.muted = false;
     }
-    tocar(v);
+    tenta(v, true);
   }
 
   // first tap on a muted film turns the sound on; after that a tap pauses and resumes, except under the native
@@ -325,7 +385,7 @@ export function Filme({
   // touch has no hover: a tap on the running film shows the bar for a few seconds. While stopped the bar stays
   // hidden, so the tap meant for the centre button changes nothing on screen before its click (iOS drops a click then)
   function revela(e: React.PointerEvent) {
-    if (e.pointerType === "mouse" || !toca) return;
+    if (e.pointerType === "mouse" || !anda) return;
     setMostra(true);
     clearTimeout(esconde.current);
     esconde.current = window.setTimeout(() => setMostra(false), 3000);
@@ -339,7 +399,9 @@ export function Filme({
   }
 
   const botao = "grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition hover:bg-white/15";
-  const visto = mostra && toca && !nativos;
+  const visto = mostra && anda && !nativos;
+  // the poster stays on top until the first real frames, and comes back after an error
+  const capa = !jaAndou || falhou;
   const heroi = modo === "heroi";
   return (
     <div className={`relative ${className}`}>
@@ -375,6 +437,15 @@ export function Filme({
             >
               <track kind="captions" src={A(filme.vtt)} srcLang="en" label="English" default />
             </video>
+            <img
+              src={A(filme.poster)}
+              alt=""
+              aria-hidden="true"
+              data-capa=""
+              decoding="async"
+              draggable={false}
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${capa ? "opacity-100" : "opacity-0"}`}
+            />
 
             {cue && !filme.legendasQueimadas && (
               <p
@@ -385,7 +456,7 @@ export function Filme({
               </p>
             )}
 
-            {!toca && (
+            {!anda && (
               <button
                 type="button"
                 onClick={playCentro}
@@ -397,7 +468,7 @@ export function Filme({
               </button>
             )}
 
-            {toca && !som && (
+            {anda && !som && (
               <button
                 type="button"
                 onClick={(e) => {
