@@ -9,8 +9,11 @@ export interface Reel {
   titulo: string;
 }
 
-/** The three 9:16 reels, in the order of the reels body sentence; each title is the reel's own closing line. */
+/** The six 9:16 reels, in the order of the reels body sentence: the first three (copy deck 3.2), then the three added after them. */
 export const REELS: readonly Reel[] = [
+  { id: "reel-intake", titulo: "How many requests reached Legal today?" },
+  { id: "reel-review", titulo: "One contract. Five versions." },
+  { id: "reel-deadlines", titulo: "The notice deadline passed yesterday." },
   { id: "legalVector-reel-1-round-two", titulo: "Bring their second draft. See what changed." },
   { id: "legalVector-reel-2-counterparties", titulo: "Know them before the call." },
   { id: "legalVector-reel-3-dashboard", titulo: "Report to the GC in one click." },
@@ -35,7 +38,8 @@ export function Carrossel({ reels = REELS, rotulo = "legalVector reels" }: { ree
     const mq = matchMedia("(min-width: 900px)");
     const parado = () => document.documentElement.dataset.mov === "off";
     const R = reels.length;
-    const dados = reels.concat(reels);
+    // the ring needs a hidden card on each side of the three in view, so a wrapping card never crosses the front
+    const dados = R < 5 ? reels.concat(reels) : reels.slice();
     const N = dados.length;
     let cur = 0;
     let dentro = false;
@@ -124,7 +128,8 @@ export function Carrossel({ reels = REELS, rotulo = "legalVector reels" }: { ree
         if (dd > N / 2) dd -= N;
         if (dd < -N / 2) dd += N;
         const a = Math.abs(dd);
-        const x = dd * (largo ? 70 : 52);
+        // hidden cards wait one step past the neighbours, not spread across the page
+        const x = Math.max(-2, Math.min(2, dd)) * (largo ? 70 : 52);
         const rot = a === 0 ? 1.5 : dd < 0 ? -2 : 2.5;
         li.style.transform = `translate(${x}%,0) scale(${a ? 0.84 : 1}) rotate(${rot}deg)`;
         li.style.zIndex = String(50 - a);

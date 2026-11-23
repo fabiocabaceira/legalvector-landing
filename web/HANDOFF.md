@@ -116,7 +116,8 @@ All commands run in `C:\Users\Fabio\dev\legalvector-landing\web`.
 | File | Use (copy deck §10) |
 |---|---|
 | `campaign/film/live-front-door.{mp4,webp,vtt}` | Home hero (`HERO_FILM`) |
-| `campaign/film/legalVector-reel-{1-round-two,2-counterparties,3-dashboard}.{mp4,webp}` | Home reels (`REELS`) |
+| `campaign/film/reel-{intake,review,deadlines}.{mp4,webp}` | Home reels 1 to 3 (`REELS`) |
+| `campaign/film/legalVector-reel-{1-round-two,2-counterparties,3-dashboard}.{mp4,webp}` | Home reels 4 to 6 (`REELS`) |
 | `campaign/film/live-ai-review.{mp4,webp,vtt}` | Product step 2 (`FILME_REVIEW`) |
 | `campaign/film/live-decision.{mp4,webp,vtt}` | Doxis 6.2 (`FILME_DECISAO`) |
 | `img/v4/{front-door,inbox,approval,key-dates,command-centre,process}-{1200,640}.webp` | See copy deck §10 |

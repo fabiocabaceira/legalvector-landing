@@ -2,7 +2,7 @@ import { MesaReels } from "../../reels";
 import { Surge } from "../../ui";
 import { TituloVivo } from "./TituloVivo";
 
-/** Copy deck 3.2: who it is for, then the contract drawing traces itself and the three reels rise over it. */
+/** Copy deck 3.2: who it is for, then the contract drawing traces itself and the six reels rise over it. */
 export default function Dores() {
   return (
     <section id="pain" aria-labelledby="t-pain" className="relative overflow-x-clip py-16 sm:py-24">
@@ -14,7 +14,7 @@ export default function Dores() {
         />
         <Surge atraso={0.12} className="lg:pt-3">
           <p className="border-t border-white/15 pt-5 text-pretty text-base leading-relaxed text-white/80 sm:text-lg">
-            Three moments Legal teams know too well, each about half a minute: the second draft that just landed, the call with a counterparty, the Monday report to the GC.
+            Six moments Legal teams know too well, each about half a minute: the requests nobody counted, the clause nobody read and the notice date nobody watched, then the second draft, the counterparty call and the Monday report to the GC.
           </p>
         </Surge>
       </div>
