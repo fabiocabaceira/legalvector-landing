@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { CTA, HERO_FILM, PAGINA, curva, type Linhas } from "../../base";
 import { Filme } from "../../filme";
-import { BotaoFantasma, BotaoPrincipal, LogoParceiro, TextoDesfocado, useCortina, useMov, type Parceiro } from "../../ui";
+import { BotaoFantasma, BotaoPrincipal, LogoParceiro, TextoDesfocado, useCortina, useMov } from "../../ui";
 
 const H1: Linhas = PAGINA === "ask" ? ["Stop emailing Legal.", "Start asking Legal."] : ["Make Legal the fastest team", "in the building."];
 // the home line 1 is 12.42 em wide: these sizes keep it on one row from a 360 px phone to the 1360 px column
@@ -9,12 +9,6 @@ const TAMANHO =
   PAGINA === "ask"
     ? "text-[1.875rem] sm:text-5xl lg:text-[clamp(2.4rem,3.65vw,3.25rem)]"
     : "text-[length:min(1.875rem,calc((100vw_-_2.5rem)/12.8))] sm:text-[length:clamp(2.2rem,7vw,3rem)] lg:text-[length:clamp(2.2rem,3.3vw,2.95rem)]";
-
-const OBRAS: ReadonlyArray<readonly [string, Parceiro]> = [
-  ["Alfresco Content Services", "alfresco"],
-  ["Doxis 4", "doxis"],
-  ["Microsoft Word", "word"],
-];
 
 /** Copy deck 3.1: the pain in the h1, the real product film beside it with captions on, one CTA. */
 export default function Heroi() {
@@ -58,28 +52,17 @@ export default function Heroi() {
         </div>
       </div>
 
-      <motion.ul
-        initial={mov ? { opacity: 0, y: 10 } : false}
-        animate={aberta ? { opacity: 1, y: 0 } : undefined}
+      <motion.div
+        initial={mov ? { opacity: 0, y: 10, filter: "blur(4px)" } : false}
+        animate={aberta ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
         transition={{ duration: 0.6, delay: 0.8, ease: curva }}
-        aria-label="Runs on Alfresco or Doxis, with changes as Word tracked changes"
-        className="relative mx-auto grid w-full max-w-md grid-cols-3 gap-2 px-4 pb-8 pt-10 sm:flex sm:w-fit sm:max-w-none sm:gap-x-10 sm:px-8 sm:pb-10"
+        className="relative mx-auto flex w-fit items-center justify-center gap-2.5 px-4 pb-8 pt-10 text-sm leading-tight text-white/70 sm:px-8 sm:pb-10"
       >
-        {OBRAS.map(([t, marca], i) => (
-          <motion.li
-            key={t}
-            initial={mov ? { opacity: 0, y: 8, filter: "blur(4px)" } : false}
-            animate={aberta ? { opacity: 1, y: 0, filter: "blur(0px)" } : undefined}
-            transition={{ duration: 0.5, delay: 0.85 + i * 0.09, ease: curva }}
-            className="flex flex-col items-center gap-2 text-center text-[13px] leading-tight text-white/70 sm:flex-row sm:gap-2.5 sm:text-left sm:text-sm"
-          >
-            <span className="vidro grid h-10 w-10 shrink-0 place-items-center rounded-full">
-              <LogoParceiro marca={marca} className="h-6 w-6" />
-            </span>
-            {t}
-          </motion.li>
-        ))}
-      </motion.ul>
+        <span className="vidro grid h-10 w-10 shrink-0 place-items-center rounded-full">
+          <LogoParceiro marca="doxis" className="h-6 w-6" />
+        </span>
+        Doxis 4
+      </motion.div>
     </section>
   );
 }

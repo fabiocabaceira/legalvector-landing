@@ -12,6 +12,16 @@ const mmss = (s: number) => {
 // keys that only move around the page; they are not a choice to hear the film
 const NAVEGA = new Set(["Tab", "Shift", "Control", "Alt", "Meta", "Escape", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"]);
 
+// call inside the gesture with no await before it: iOS refuses sound with NotAllowedError, then the film plays muted.
+// An AbortError means a pause() won the race, so it does not play again over that pause
+function tocar(v: HTMLVideoElement) {
+  v.play().catch((e: unknown) => {
+    if (v.muted || (e as Error)?.name === "AbortError") return;
+    v.muted = true;
+    v.play().catch(() => {});
+  });
+}
+
 /**
  * The film player (Doxter EcraProduto).
  * modo "heroi": starts after the intro, the load and the largest paint; tries sound, else plays muted and the
@@ -51,6 +61,9 @@ export function Filme({
   const [toca, setToca] = useState(false);
   const [mostra, setMostra] = useState(false);
   const [cue, setCue] = useState("");
+  // touch screens: while the film plays the native controls are on as well, which iOS Safari sometimes needs
+  const [toque] = useState(() => matchMedia("(hover: none) and (pointer: coarse)").matches);
+  const nativos = toque && toca;
   const [src] = useState(() => (filme.src1080 && innerWidth * (devicePixelRatio || 1) > 1400 ? filme.src1080 : filme.src720));
 
   // hero: wait for the intro, the load and the largest paint (or 3 s), then try with sound
@@ -70,9 +83,10 @@ export function Filme({
       tira();
       const alvo = e.target as Element | null;
       if (escolheuSom.current || alvo?.closest?.("[data-leitor]")) return;
-      v.currentTime = inicio;
+      // a seek before the metadata can break the first play on iOS
+      if (inicio || v.readyState >= 1) v.currentTime = inicio;
       v.muted = false;
-      if (v.paused && visivel.current && !maoPausou.current) v.play().catch(() => (v.muted = true));
+      if (visivel.current && !maoPausou.current) tocar(v);
     }
     const arranca = () => {
       if (!vivo) return;
@@ -140,7 +154,7 @@ export function Filme({
         visivel.current = e.isIntersecting;
         if (!e.isIntersecting) {
           if (!v.paused) v.pause();
-        } else if (v.paused && pronto.current && !maoPausou.current && movLigado()) v.play().catch(() => {});
+        } else if (v.paused && pronto.current && !maoPausou.current && movLigado()) tocar(v);
       },
       { threshold: 0.25 },
     );
@@ -260,7 +274,7 @@ export function Filme({
     if (!v.muted && v.paused) {
       maoPausou.current = false;
       pronto.current = true;
-      v.play().catch(() => {});
+      tocar(v);
     }
   }
 
@@ -269,7 +283,7 @@ export function Filme({
     if (v.paused) {
       maoPausou.current = false;
       pronto.current = true;
-      v.play().catch(() => {});
+      tocar(v);
     } else {
       maoPausou.current = true;
       v.pause();
@@ -278,15 +292,16 @@ export function Filme({
 
   function comSomDoInicio() {
     const v = video.current!;
-    v.currentTime = inicio;
+    if (inicio || v.readyState >= 1) v.currentTime = inicio;
     escolheuSom.current = true;
     v.muted = false;
     maoPausou.current = false;
     pronto.current = true;
-    v.play().catch(() => {});
+    tocar(v);
   }
 
-  // the centre button: play() runs inside the tap itself, which iOS needs (also in Low Power Mode)
+  // the centre button: play() runs inside the tap itself, which iOS needs (also in Low Power Mode).
+  // load() only queues the fetch, so the play() after it still comes from the same tap
   function playCentro(e: React.MouseEvent) {
     e.stopPropagation();
     const v = video.current!;
@@ -297,16 +312,14 @@ export function Filme({
       escolheuSom.current = true;
       v.muted = false;
     }
-    v.play().catch(() => {
-      v.muted = true;
-      v.play().catch(() => {});
-    });
+    tocar(v);
   }
 
-  // first tap on a muted film turns the sound on; after that a tap pauses and resumes
+  // first tap on a muted film turns the sound on; after that a tap pauses and resumes, except under the native
+  // touch controls, which own play and pause there
   function tocaVideo() {
     if (video.current!.muted && !escolheuSom.current) comSomDoInicio();
-    else alternarPlay();
+    else if (!nativos) alternarPlay();
   }
 
   // touch has no hover: a tap on the running film shows the bar for a few seconds. While stopped the bar stays
@@ -326,7 +339,7 @@ export function Filme({
   }
 
   const botao = "grid h-10 w-10 shrink-0 place-items-center rounded-full text-white transition hover:bg-white/15";
-  const visto = mostra && toca;
+  const visto = mostra && toca && !nativos;
   const heroi = modo === "heroi";
   return (
     <div className={`relative ${className}`}>
@@ -349,6 +362,8 @@ export function Filme({
               poster={A(filme.poster)}
               muted
               playsInline
+              webkit-playsinline="true"
+              controls={nativos}
               preload="metadata"
               width="1280"
               height="720"
@@ -397,7 +412,7 @@ export function Filme({
             )}
 
             <div
-              className={`absolute inset-x-0 bottom-0 z-10 flex items-center gap-2 bg-gradient-to-t from-[rgba(11,21,20,.9)] via-[rgba(11,21,20,.45)] to-transparent px-2 pb-2 pt-12 transition-opacity duration-300 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 sm:gap-3 sm:px-3 ${visto ? "opacity-100" : "pointer-events-none opacity-0"}`}
+              className={`absolute inset-x-0 bottom-0 z-10 flex items-center gap-2 bg-gradient-to-t from-[rgba(11,21,20,.9)] via-[rgba(11,21,20,.45)] to-transparent px-2 pb-2 pt-12 transition-opacity duration-300 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 sm:gap-3 sm:px-3 ${nativos ? "hidden" : visto ? "opacity-100" : "pointer-events-none opacity-0"}`}
             >
               <button type="button" onClick={alternarPlay} aria-label={toca ? "Pause the video" : "Play the video"} className={botao}>
                 {toca ? <Pausa className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
